@@ -20,13 +20,16 @@ def parse_oxford_response_data(response, word_from_request) -> []:
         return result.values()
     json_results = response['results'][0]['lexicalEntries']
     for word_definition in json_results:
-        definition = [word_definition['entries'][0]['senses'][0]['definitions'][0]]
-        word_type = word_definition['lexicalCategory']
-        word = Word(word_from_request, definition, word_type)
-        if word.word in result.keys():
-            result.get(word.word).append_definition(definition)
-        else:
-            result[word.word] = word
+        try:
+            definition = [word_definition['entries'][0]['senses'][0]['definitions'][0]]
+            word_type = word_definition['lexicalCategory']
+            word = Word(word_from_request, definition, word_type)
+            if word.word in result.keys():
+                result.get(word.word).append_definition(definition)
+            else:
+                result[word.word] = word
+        except KeyError:
+            print('parse error for: ', word_from_request)
     parsed_result = []
     for value in result.values():
         parsed_result.append(value.prepare_for_quizlet())
